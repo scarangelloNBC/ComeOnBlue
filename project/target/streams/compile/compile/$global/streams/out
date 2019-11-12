@@ -1,0 +1,10 @@
+[error] /Users/a206622245/Documents/GitHub/ComeOnBlue/project/Dependencies.scala:8:24: value %% is not a member of String
+[error]     "net.ruippeixotog" %% "scala-scraper" % V.ScalaScraper
+[error]                        ^
+[error] /Users/a206622245/Documents/GitHub/ComeOnBlue/project/Dependencies.scala:11:22: value % is not a member of String
+[error]     "org.apache.poi" % "poi" % V.Poi,
+[error]                      ^
+[error] /Users/a206622245/Documents/GitHub/ComeOnBlue/project/Dependencies.scala:12:22: value % is not a member of String
+[error]     "org.apache.poi" % "poi-ooxml" % "3.17"
+[error]                      ^
+[error] three errors found

@@ -21,24 +21,25 @@ object GameUtil {
     }
   }
 
-  def getAllPitchesFromGame(gameLink: String): Option[Seq[Option[PitchInfo]]] = {
+  def getAllPitchesFromGame(gameLink: String): Seq[Option[PitchInfo]] = {
     try {
       val xmlDoc = XML.load(s"${gameLink}game_events.xml")
       val pitches = xmlDoc \\ "pitch"
-      Some(pitches.map {
+      pitches.map {
         case pitch: Node =>
-          if((pitch \ "@des").toString == "Ball" || (pitch \ "@des").toString == "Called Strike") {
+          if((pitch \ "@des").nonEmpty && (pitch \ "@sz_top").nonEmpty && (pitch \ "@sz_bot").nonEmpty && (pitch \ "@px").nonEmpty && (pitch \ "@pz").nonEmpty &&
+            ((pitch \ "@des").toString == "Ball" || (pitch \ "@des").toString == "Called Strike")) {
             Some(PitchInfo((pitch \\ "@des").toString, (pitch \\ "@sz_top").toString.toDouble, (pitch \\ "@sz_bot").toString.toDouble, (pitch \ "@px").toString.toDouble, (pitch \ "@pz").toString.toDouble))
           }
           else {
             None
           }
-      })
+      }
     }
     catch {
       case exception: Throwable =>
         exception.printStackTrace
-        None
+        Seq(None)
     }
   }
 

@@ -6,4 +6,5 @@ scalaVersion := "2.11.12"
 
 libraryDependencies ++=
   Dependencies.scalaScrapper ++
-  Dependencies.poi
+  Dependencies.poi ++
+  Dependencies.XML

@@ -1,4 +1,4 @@
-import scala.xml.{Node, XML}
+import scala.xml.{Elem, Node}
 
 object PitchUtil {
 
@@ -19,7 +19,7 @@ object PitchUtil {
       case "Called Strike" =>
         pz > (topLimit + (ballDiameter * 2.5)) || pz < (botLimit - (ballDiameter * 2.5))
       case "Ball" =>
-        pz < (topLimit - (ballDiameter * 1.5)) && pz > (botLimit + (ballDiameter * 1.5))
+        pz < (topLimit - (ballDiameter * 1.25)) && pz > (botLimit + (ballDiameter * 1.25))
     }
   }
 
@@ -28,24 +28,29 @@ object PitchUtil {
       case "Called Strike" =>
         px.abs > ((plateWidth / 2) + ((ballDiameter * 2.5) / 2))
       case "Ball" =>
-        px.abs < ((plateWidth / 2) - ((ballDiameter * 1.5) / 2))
+        px.abs < ((plateWidth / 2) - ((ballDiameter * 1.25) / 2))
     }
   }
 
-  def getAllPitchesFromGame(gameLink: String): Seq[Option[PitchInfo]] = {
+  def getAllPitchesFromGame(xmlDoc: Elem): (Seq[Option[PitchInfo]]) = {
     try {
-      val xmlDoc = XML.load(s"${gameLink}game_events.xml")
-      val pitches = xmlDoc \\ "pitch"
-      pitches.map {
-        case pitch: Node =>
-          if((pitch \ "@des").nonEmpty && (pitch \ "@sz_top").nonEmpty && (pitch \ "@sz_bot").nonEmpty && (pitch \ "@px").nonEmpty && (pitch \ "@pz").nonEmpty &&
-            ((pitch \ "@des").toString == "Ball" || (pitch \ "@des").toString == "Called Strike")) {
-            Some(PitchInfo((pitch \\ "@des").toString, (pitch \\ "@sz_top").toString.toDouble, (pitch \\ "@sz_bot").toString.toDouble, (pitch \ "@px").toString.toDouble, (pitch \ "@pz").toString.toDouble))
-          }
-          else {
-            None
+      val allAtBats = xmlDoc \\ "atbat"
+      allAtBats.flatMap {
+        case atBat: Node =>
+          val pitches = atBat \\ "pitch"
+          val playResult = (atBat \ "@des").toString
+          pitches.map {
+            case pitch: Node =>
+              if((pitch \ "@des").nonEmpty && (pitch \ "@sz_top").nonEmpty && (pitch \ "@sz_bot").nonEmpty && (pitch \ "@px").nonEmpty && (pitch \ "@pz").nonEmpty &&
+                ((pitch \ "@des").toString == "Ball" || (pitch \ "@des").toString == "Called Strike")) {
+                Some(PitchInfo((pitch \\ "@des").toString, (pitch \\ "@sz_top").toString.toDouble, (pitch \\ "@sz_bot").toString.toDouble, (pitch \ "@px").toString.toDouble, (pitch \ "@pz").toString.toDouble, playResult))
+              }
+              else {
+                None
+              }
           }
       }
+
     }
     catch {
       case exception: Throwable =>
